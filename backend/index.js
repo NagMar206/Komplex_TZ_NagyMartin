@@ -1,36 +1,39 @@
-const express = require("express");
-const mysql = require("mysql");
-const cors = require("cors");
+const express = require("express")
+const mysql = require("mysql2")
+const cors = require("cors")
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+const app = express()
+app.use(express.json())
+app.use(cors())
 
-// MySQL adatbázis kapcsolat
 const db = mysql.createConnection({
-  host: "localhost",  
-  user: "root",       
-  password: "",       
-  database: "felveteli",
-  port: 3307
-});
+    host: "localhost",
+    port: "3307",
+    user: "root",
+    password: "",
+    database: "felveteli"
+})
 
-// Kapcsolódás az adatbázishoz
-db.connect(err => {
-  if (err) {
-    console.error("Hiba a MySQL kapcsolódás során:", err);
-    return;
-  }
-  console.log("Sikeres MySQL kapcsolat!");
-});
+db.connect((err) => {
+    if(err){
+        console.error("Hiba történt a MySQL szerverhez való kapcsolódáskor: ", err)
+    }
+    else{
+        console.log("Sikeresen csatlakozott a MySQL szerverhez!")
+    }
+})
 
-// Főoldal teszt
-app.get("/", (req, res) => {
-  res.send("Báckend működik!");
-});
+app.get("/diakok",(request,response) => {
+    db.query("select nev, agazat, hozott+kpmagy+kpmat as osszpont from diakok " +
+    "inner join jelentkezesek on oktazon = jelentkezesek.diak " +
+    "inner join tagozatok on akod = jelentkezesek.tag " +
+    "order by nev asc", (err,results) => {
+        if(err) return response.status(500).json(err)
+        response.json(results)
+    })
 
-// Szerver indítása
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Szerver fut: http://localhost:${PORT}`);
-});
+})
+
+app.listen(5000, () => {
+    console.log("A szerver fut az 3000-es porton!")
+})
