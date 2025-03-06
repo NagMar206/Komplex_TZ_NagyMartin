@@ -10,6 +10,7 @@ import 'tachyons'
 function App() {
 
   const [data, setData] = useState([]);
+  const [selectedAgazat, setSelectedAgazat] = useState("");
  
   useEffect(() => {
     fetch("http://127.0.0.1:5000/diakok")
@@ -24,6 +25,10 @@ function App() {
       })
       .catch((error) => console.error("Hiba:", error));
   }, []);
+
+  const filteredData = selectedAgazat
+  ? data.filter((diak) => diak.agazat === selectedAgazat)
+  : data;
 
   return (
     <>
@@ -66,13 +71,19 @@ function App() {
 
 
 <div>
-<div className='row'>
-    <div className='col-md-5'>
-        <h3 className='text-left'>A felvételt nyert tanulók névsora a nyelvi előkészítőre</h3>
-        <div>
-        </div>
+<div className="row">
+        <div className="col-md-5">
+          <h3>A felvételt nyert tanulók névsora a nyelvi előkészítőre</h3>
+          <label>Válassz egy ágazatot:</label>
+          <select onChange={(e) => setSelectedAgazat(e.target.value)}>
+            <option value="">Összes</option>
+            <option value="informatika">Informatika</option>
+            <option value="elektronika">Elektronika</option>
+          </select>
+          <button onClick={() => setSelectedAgazat("")}>Adatok</button>
+
     </div>
-<table>
+<table className="table table-striped table-hover">
     <thead>
     <th scope="col ">Előzetes névsor:</th>
     <tr>
@@ -92,7 +103,7 @@ function App() {
             ))
           ) : (
             <tr>
-              <td colSpan="3" className="text-center">Nincs elérhető adat</td>
+              <td colSpan="3" className="text-center">Nincs adat</td>
             </tr>
           )}
         </tbody>
